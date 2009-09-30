@@ -76,6 +76,9 @@
           withOperation: [[BoundedDrawOperation alloc]
                              initWithDrawingArea: _area
                                    objectBuilder: function () { return new StraightLine(); }]];
+    [self addItem: 'Free Line' withImage: 'Resources/freeLineDraw.png'
+          withOperation: [[FreeLineOperation alloc]
+                             initWithDrawingArea: _area]];
     [self addItem: 'Rectangle' withImage: 'Resources/squareDraw.png'
           withOperation: [[BoundedDrawOperation alloc]
                              initWithDrawingArea: _area

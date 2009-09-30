@@ -921,8 +921,7 @@ FreeLine.prototype.getMainPoints = function () {
   return res.concat(this.getPoints());
 };
 
-FreeLine.prototype.draw = function (c) {
-  var ctx = c.getContext('2d');
+FreeLine.prototype.draw = function (ctx) {
   ctx.save();
   var pts = this.getPoints();
   if (pts.length === 0) {
@@ -951,14 +950,13 @@ FreeLine.prototype.draw = function (c) {
   ctx.restore();
 };
 
-FreeLine.prototype.drawSelection = function (c) {
-  Figure.prototype.drawSelection.call(this, c);
+FreeLine.prototype.drawSelection = function (ctx) {
+  Figure.prototype.drawSelection.call(this, ctx);
   if (!this.isSelected()) {
     return;
   }
 
   var pts = this.getPoints();
-  var ctx = c.getContext('2d');
   ctx.save();
   (new Colour(100, 100, 100, new Opacity(0.8))).applyToContext(ctx);
   var i = 0;
