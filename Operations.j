@@ -21,9 +21,9 @@
 
 -(CGPoint)relativeLocation:(CPEvent)e
 {
-    return [_area convertPoint: [e locationInWindow]
-                      fromView: nil];
-
+    var pt =  [_area convertPoint: [e locationInWindow]
+                         fromView: nil];
+    return [_area convertPointToCanvas: pt];
 }
 
 -(void)installOperation:(CPEvent)e
@@ -131,17 +131,25 @@
 -(void)mouseDown:(CPEvent)e
 {
     lastPoint = [self relativeLocation: e];
+    var area = [self area];
     var pt = new Point(lastPoint.x, lastPoint.y);
-    var fs = [[self area] figureSet];
-    var selected = fs.selectFigure(pt);
-    [self _selectSetterFor: selected || selectedFigure at: pt];
+    var fs = [area figureSet];
+    //var selectionPoint = [_area convertPoint: [e locationInWindow]
+    //                   fromView: nil];
+    var selected = fs.selectFigure(pt, [area currentOffset], [area currentScale]);
+    var toset = selected || selectedFigure;
+    if (toset) {
+        [self _selectSetterFor: toset at: pt];
+    }
     if (selectedFigure) {
         selectedFigure.setSelection(false);
         selectedFigure = nil;
+        [[self area] selectedFigureChanged: nil];
     }
     if (selected) {
         selected.setSelection(true);
         selectedFigure = selected;
+        [[self area] selectedFigureChanged: selectedFigure];
     }
 
     [[self area] display];
@@ -202,6 +210,27 @@
         lastPoint = pt;
     }
     [[self area] display];
+}
+@end
+
+@implementation ZoomOperation : Operation
+{
+    -(float)factor;
+}
+
+-(ZoomOperation)initWithDrawingArea:(DrawingArea)a factor:(float)f
+{
+    [super initWithDrawingArea: a];
+    factor = f;
+
+    return self;
+}
+
+-(void)mouseDown:(CPEvent)e
+{
+    var area = [self area];
+    [area setScale: [area currentScale]+factor at: [self relativeLocation: e]];
+    [area display];
 }
 
 @end

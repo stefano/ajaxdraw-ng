@@ -7,16 +7,23 @@
 @import "Utils.j"
 @import "Figures.j"
 @import "Operations.j"
+@import "PropertiesDialogs.j"
 
 @implementation DrawingArea : CPView
 {
     -(FigureSet)fs;
+    -(float)scale;
+    -(CGPoint)offset;
+    -(ColorDialog)colorDialog;
 }
 
 -(void)initWithFrame:(CGRect)aRect
 {
     [super initWithFrame: aRect];
     fs = new FigureSet();
+    scale = 1.0;
+    offset = CGPointMakeZero();
+    colorDialog = [[ColorDialog alloc] initWithin: self];
 
     return self;
 }
@@ -24,15 +31,51 @@
 -(void)drawRect:(CPRect)aRect
 {
     var ctx = [[CPGraphicsContext currentContext] graphicsPort];
+    ctx.save();
+    ctx.translate(offset.x, offset.y);
+    ctx.scale(scale, scale);
     fs.each(function (f) {
             f.draw(ctx);
             f.drawSelection(ctx);
             });
+    ctx.restore();
 }
 
--(void)figureSet
+-(id)figureSet
 {
     return fs;
+}
+
+-(float)currentScale { return scale; }
+
+-(void)setScale:(float)newScale at:(CGPoint)absPt
+{
+    offset.x += scale*absPt.x - newScale*absPt.x;
+    offset.y += scale*absPt.y - newScale*absPt.y;
+    scale = newScale;
+}
+
+-(CGPoint)currentOffset { return offset; }
+
+-(void)setOffset:(CGPoint)pt
+{
+    offset = pt;
+}
+
+-(CGPoint)convertPointToCanvas:(CGPoint)pt
+{
+    var res = CGPointMakeCopy(pt);
+    res.x -= offset.x;
+    res.y -= offset.y;
+    res.x /= scale;
+    res.y /= scale;
+
+    return res;
+}
+
+-(void)selectedFigureChanged:(id)figure
+{
+    [colorDialog selectedFigureChanged: figure];
 }
 @end
 
@@ -72,6 +115,10 @@
     [self addItem: 'Select' withImage: 'Resources/selectDraw.png'
           withOperation: [[SelectOperation alloc]
                              initWithDrawingArea: _area]];
+    [self addItem: 'Zoom In' withImage: 'Resources/zoom.png'
+          withOperation: [[ZoomOperation alloc]
+                             initWithDrawingArea: _area
+                                          factor: 1.0]];
     [self addItem: 'Line' withImage: 'Resources/lineDraw.png'
           withOperation: [[BoundedDrawOperation alloc]
                              initWithDrawingArea: _area

@@ -278,7 +278,7 @@ Colour.prototype.createWidget = function () {
 };
 
 Colour.prototype.toCSS = function () {
-  var to16 = function (x) {
+    /*  var to16 = function (x) {
     if (x < 16) {
       // pad with a 0
       return '0' + x.toString(16);
@@ -287,7 +287,10 @@ Colour.prototype.toCSS = function () {
     }
   };
 
-  return '#' + to16(this._r) + to16(this._g) + to16(this._b);
+  return '#' + to16(this._r) + to16(this._g) + to16(this._b);*/
+
+    return 'rgba(' + this._r + ',' + this._g + ',' + this._b + ',' + 
+    this.getOpacity().getVal() + ')';
 };
 
 /**
@@ -488,7 +491,7 @@ FigureSet.prototype.fallbackSelection = function (where) {
  * @param {Point} where point to match against
  * @return matching figure or null
  */
-FigureSet.prototype.selectFigure = function (where, scale, offset) {
+FigureSet.prototype.selectFigure = function (where) {
   var r = 0;
   var g = 0;
   var b = 0;
@@ -515,12 +518,6 @@ FigureSet.prototype.selectFigure = function (where, scale, offset) {
 
   c.width = 1024;//cv.width;
   c.height = 1024;//cv.height;
-
-  var absWhere = where;
-  if (scale) {
-    absWhere = scale.toAbs(where, offset);
-    scale.applyToContext(c.getContext('2d'), offset);
-  }
 
   var ctx = c.getContext('2d');
   ctx.lineWidth = 10; // easier selection of lines
@@ -558,7 +555,7 @@ FigureSet.prototype.selectFigure = function (where, scale, offset) {
               pos++;
             });
   // get the selected pixel
-  var selection = ctx.getImageData(absWhere.x, absWhere.y, 1, 1).data;
+  var selection = ctx.getImageData(where.x, where.y, 1, 1).data;
   var col = new Colour(selection[0], selection[1], selection[2], o);
   var res = fs[col.toCSS()]; // is it associated with a figure?
   if (!res) { // no figure selected
