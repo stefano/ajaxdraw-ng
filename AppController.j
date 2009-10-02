@@ -118,7 +118,11 @@
     [self addItem: 'Zoom In' withImage: 'Resources/zoom.png'
           withOperation: [[ZoomOperation alloc]
                              initWithDrawingArea: _area
-                                          factor: 1.0]];
+                                          factor: 0.1]];
+    [self addItem: 'Zoom Out' withImage: 'Resources/zoomOut.png'
+          withOperation: [[ZoomOperation alloc]
+                             initWithDrawingArea: _area
+                                          factor: -0.1]];
     [self addItem: 'Line' withImage: 'Resources/lineDraw.png'
           withOperation: [[BoundedDrawOperation alloc]
                              initWithDrawingArea: _area
